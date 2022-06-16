@@ -3,8 +3,12 @@ from django.db.models import Count
 from blog.models import Comment, Post, Tag
 
 def get_top_posts():
-    sorted_by_likes = Post.objects.all().annotate(likes_count=Count('likes')).order_by('-likes_count')
+    sorted_by_likes = Post.objects.all()\
+        .annotate(likes_count=Count('likes'))\
+        .order_by('-likes_count')\
+        .prefetch_related('author')
     return sorted_by_likes[0:5]
+
 
 def get_related_posts_count(tag):
     return tag.posts.count()
@@ -35,7 +39,7 @@ def index(request):
 
     most_popular_posts = get_top_posts()  # TODO. Как это посчитать?
 
-    fresh_posts = Post.objects.order_by('published_at')
+    fresh_posts = Post.objects.order_by('published_at').prefetch_related('author')
     most_fresh_posts = list(fresh_posts)[-5:]
 
     most_popular_tags = Tag.objects.all().annotate(related_posts=Count('posts')).order_by('-related_posts')[0:5]
