@@ -46,7 +46,7 @@ def serialize_post(post):
 def serialize_tag(tag):
     return {
         'title': tag.title,
-        'posts_with_tag': len(Post.objects.filter(tags=tag)),
+        'posts_with_tag': Post.objects.filter(tags=tag).count(),
     }
 
 
@@ -117,7 +117,7 @@ def tag_filter(request, tag_title):
 
     most_popular_posts = []  # TODO. Как это посчитать?
 
-    related_posts = tag.posts.all()[:20]
+    related_posts = tag.posts.all().prefetch_related('author')[:20]
 
     context = {
         'tag': tag.title,
