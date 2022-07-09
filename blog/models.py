@@ -4,12 +4,24 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 
 
+class PostQuerySet(models.QuerySet):
+    def popular(self):
+        popular = self.annotate(likes_count=Count('likes')).order_by('-likes_count')
+        return popular
+
+    def fetch_with_comments_count(self):
+        fetch_with_comments_count = self.prefetch_related('comments')
+        return fetch_with_comments_count
+
+
 class Post(models.Model):
     title = models.CharField('Заголовок', max_length=200)
     text = models.TextField('Текст')
     slug = models.SlugField('Название в виде url', max_length=200)
     image = models.ImageField('Картинка')
     published_at = models.DateTimeField('Дата и время публикации')
+
+    objects = PostQuerySet.as_manager()
 
     author = models.ForeignKey(
         User,
