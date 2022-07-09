@@ -10,6 +10,7 @@ class PostQuerySet(models.QuerySet):
         return popular
 
     def fetch_with_comments_count(self):
+        '''Return prefetcheed comment, useful to add for any pages'''
         fetch_with_comments_count = self.prefetch_related('comments')
         return fetch_with_comments_count
 
